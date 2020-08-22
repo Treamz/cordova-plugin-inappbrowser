@@ -1467,46 +1467,55 @@ public class InAppBrowser extends CordovaPlugin {
             }
         }
 
+       // Rejected by Google Play - Failed to validate the certificate chain
         @Override
-        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-            super.onReceivedSslError(view, handler, error);
-            try {
-                JSONObject obj = new JSONObject();
-                obj.put("type", LOAD_ERROR_EVENT);
-                obj.put("url", error.getUrl());
-                obj.put("code", 0);
-                obj.put("sslerror", error.getPrimaryError());
-                String message;
-                switch (error.getPrimaryError()) {
-                case SslError.SSL_DATE_INVALID:
-                    message = "The date of the certificate is invalid";
+        public void onReceivedSslError(WebView view, final SslErrorHandler handler, SslError error) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(webView.getContext(), R.style.AlertDialogCustom));
+            String message = "SSL Certificate error.";
+            switch (error.getPrimaryError()) {
+                case SslError.SSL_NOTYETVALID:
+                    message = "The certificate is not yet valid.";
                     break;
                 case SslError.SSL_EXPIRED:
-                    message = "The certificate has expired";
+                    message = "The certificate has expired.";
                     break;
                 case SslError.SSL_IDMISMATCH:
-                    message = "Hostname mismatch";
-                    break;
-                default:
-                case SslError.SSL_INVALID:
-                    message = "A generic error occurred";
-                    break;
-                case SslError.SSL_NOTYETVALID:
-                    message = "The certificate is not yet valid";
+                    message = "Hostname mismatch.";
                     break;
                 case SslError.SSL_UNTRUSTED:
-                    message = "The certificate authority is not trusted";
+                    message = "The certificate authority is not trusted.";
                     break;
-                }
-                obj.put("message", message);
-
-                sendUpdate(obj, true, PluginResult.Status.ERROR);
-            } catch (JSONException ex) {
-                LOG.d(LOG_TAG, "Should never happen");
+                case SslError.SSL_DATE_INVALID:
+                    message = "The date of the certificate is invalid.";
+                    break;
+                case SslError.SSL_INVALID:
+                    message = "A generic error occurred.";
+                    break;
+                case SslError.SSL_MAX_ERROR: /* Deprecated in API level 14*/
+                    message = "The number of different SSL errors.";
+                    break;
             }
-            handler.cancel();
-        }
+            message += " Do you want to continue anyway?";
 
+            builder.setTitle("SSL Certificate Error");
+            builder.setMessage(message);
+            builder.setPositiveButton("continuar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    handler.proceed();
+                }
+            });
+            builder.setNegativeButton("cancelar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    handler.cancel();
+                    closeDialog();
+                }
+            });
+            final AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+        
         /**
          * On received http auth request.
          */
