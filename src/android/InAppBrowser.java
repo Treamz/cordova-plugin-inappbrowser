@@ -18,6 +18,8 @@
 */
 package org.apache.cordova.inappbrowser;
 
+import android.R;
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.ComponentName;
@@ -34,6 +36,12 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Color;
 import android.net.http.SslError;
+
+import android.view.ContextThemeWrapper;
+import android.support.v7.app.AlertDialog;
+import android.content.DialogInterface;
+
+
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -65,9 +73,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import android.view.ContextThemeWrapper;
-import android.support.v7.app.AlertDialog;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.Config;
@@ -1473,7 +1478,7 @@ public class InAppBrowser extends CordovaPlugin {
        // Rejected by Google Play - Failed to validate the certificate chain
         @Override
         public void onReceivedSslError(WebView view, final SslErrorHandler handler, SslError error) {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(webView.getContext(), R.style.AlertDialogCustom));
+            final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(webView.getContext(), android.R.style.Theme_Dialog));
             String message = "SSL Certificate error.";
             switch (error.getPrimaryError()) {
                 case SslError.SSL_NOTYETVALID:
