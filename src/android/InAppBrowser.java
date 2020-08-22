@@ -66,6 +66,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import android.view.ContextThemeWrapper;
+import android.support.v7.app.AlertDialog;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.Config;
 import org.apache.cordova.CordovaArgs;
